@@ -1,0 +1,10 @@
+Start a basic "everything includes this" file
+- Read the config
+- Default the variables from config
+- Check for unset required variables, and exit if not set
+- Export values for: APCA_API_BASE_URL, APCA_API_KEY_ID, APCA_API_SECRET_KEY
+
+Add a dependency list.
+- TickTick.sh
+- curl
+

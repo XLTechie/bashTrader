@@ -1,0 +1,49 @@
+#!/bin/bash
+# bashTrader main console.
+
+# Gets a word from the user and returns it
+function readMore {
+local returnable
+read returnable
+echo "$returnable"
+}
+
+
+# Main loop
+while read -srN1 command; do
+
+# Main commands
+case $command in
+
+v) # Account values
+echo "Valuable!"
+;;
+
+q)
+echo "Get a quote"
+;;
+
+b)
+echo "Buy buy buy!"
+;;
+
+s)
+echo 'Sell sell sell!'
+;;
+
+S)
+echo "Shorter than ever"
+;;
+
+.)
+break
+;;
+
+*)
+echo "What?"
+;;
+
+esac
+
+unset command
+done
