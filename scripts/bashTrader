@@ -1,11 +1,28 @@
 #!/bin/bash
 # bashTrader main console.
 
+set -e
+
+# Simple system to tell included code not to run unless included by us
+____bashTrader_is_running____=yes
+
+source ticktick.sh		# For processing JSON
+source support_functions.sh	# Various support animals
+
+
 # Gets a word from the user and returns it
 function readMore {
 local returnable
 read returnable
 echo "$returnable"
+}
+
+# Requestors:
+# Each takes a handler, followed by an endpoint (the part at the end of the URL).
+# Some may also take parameters.
+
+# Sends a simple request, with no parameters
+function r_simple {
 }
 
 
