@@ -17,17 +17,18 @@ function r_simple {
 local incoming
 
 # Construct the URL from the base URL and the provided endpoint
-URL="${tradingURL}/GET/V$1"
+URL="${APCA_API_BASE_URL}/V$1"
 # Add the request parameters, if any
 [ -n "$2" ] && URL+="/$2"
 # FixMe: should log the URL here
+#echo 1>&2 "URL: $URL"
 
 # Submit the request, unless this is test mode, in which case don't
 if [ "$testMode" = "no" ]; then
-export APCA_API_BASE_URL APCA_API_KEY_ID APCA_API_SECRET_KEY
+export APCA_API_KEY_ID APCA_API_SECRET_KEY
 incoming=`curl $URL` || \
 e_error "CURL failed!" 2
-export -n APCA_API_BASE_URL APCA_API_KEY_ID APCA_API_SECRET_KEY
+export -n APCA_API_KEY_ID APCA_API_SECRET_KEY
 else # Generate fake data
 incoming="$testModeData"
 fi

@@ -7,6 +7,7 @@
 # That said, if you like this project and want to contribute, I welcome it. Email me or submit a pull request.
 
 set -e
+shopt -s expand_aliases
 
 # Early stage user Configuration:
 # (FixMe: remove in "production" release)
@@ -38,6 +39,9 @@ source ticktick.sh	# For processing JSON
 source logs-errors.sh	# Logging and error handling code (okay, it also handles warnings)
 source send_receive.sh	# Functions that send or receive transactions to/from the brokerage
 source processors.sh	# Data processing functions
+
+# CURLisms
+alias curl='curl -qsS --retry 1 -m 3 --proto =https -o -'
 
 # Test mode things
 if [ "$testMode" != "no" ]; then
