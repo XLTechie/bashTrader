@@ -92,6 +92,11 @@ while read -srN1 command; do
 # Main commands
 case $command in
 
+a)	# Account
+r_simple 2/account
+catchErrorMessage || tickVars -nli
+;;
+
 v) # Account values
 echo "Valuable!"
 ;;
@@ -102,13 +107,12 @@ echo Symbol cleared.
 ;;
 
 q)	# Get a simple quote
-#set -x
 # If the symble isn't already set, get it
 while [ -z "$symbol" ]; do
 read -rp "Symbol: " symbol _
 done
 r_simple 2/assets "$symbol"
-tickVars -nli
+catchErrorMessage || tickVars -nli
 ;;
 
 b)

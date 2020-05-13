@@ -17,11 +17,11 @@ function r_simple {
 local incoming
 
 # Construct the URL from the base URL and the provided endpoint
-URL="${APCA_API_BASE_URL}/V$1"
+URL="${APCA_API_BASE_URL}/v$1"
 # Add the request parameters, if any
 [ -n "$2" ] && URL+="/$2"
 # FixMe: should log the URL here
-#echo 1>&2 "URL: $URL"
+##echo 1>&2 "URL: $URL"
 
 # Submit the request, unless this is test mode, in which case don't
 if [ "$testMode" = "no" ]; then

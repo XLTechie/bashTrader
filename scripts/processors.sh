@@ -1,6 +1,6 @@
 # simplePrint: prints a human friendly listing of the passed JSON object
 # keySplitter: returns an array of the provided JSON key elements (subtracting TickTickisms)
-
+# catchErrorMessage: looks for errors in the returned JSON, prints them, and clears the JSON
 # Simple no-op to prevent running in other than our expected environment
 [ -z "$____bashTrader_is_running____" ] && { echo 1>&2 "This is meant to be included in bashTrader; exiting!"; exit 255; }
 
@@ -25,3 +25,16 @@ keySplitter keys "$item"
 echo "${keys[-1]}: ${!item}"
 done
 }
+
+# Looks for errors in the returned JSON, prints them, and clears the JSON.
+# Returns true if it did anything, false if not.
+function catchErrorMessage {
+if [ -n "``message``" ]; then
+echo "Error! ``message``"
+``message.delete()``
+``code.delete()``
+return 0
+else return 1
+fi
+}
+
