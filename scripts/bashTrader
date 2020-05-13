@@ -1,48 +1,75 @@
 #!/bin/bash
 # bashTrader main console.
 
+# Note to hypethetical other hackers of this code:
+# I'm blind--I don't need no stinkin' indentation. Suck it up, snowflake.
+# Although sometimes I use it just to keep myself guessing.
+# That said, if you like this project and want to contribute, I welcome it. Email me or submit a pull request.
+
 set -e
 
-# User Configuration:
-readonly testMode=yes	# If we want to run without actually contacting the brokerage, set this
+# Early stage user Configuration:
+# (FixMe: remove in "production" release)
 logFile="/dev/null"	# Not implemented
 readonly debugging=0	# Not implemented
-live=no	# If yes, we are in live trading mode; paper trading for anything else. Can be overridden from the user config
+live=no	# If YES, we are in live trading mode; paper trading for anything else. Can be overridden from the user config
+testMode=yes	# Local only mode; configure in user config for now, and set to no in production (FixMe)
 
 # Error states:
+# 1: Key not set error.
 # 2: CURL failed
 # 200: Trading URL not set
 # 201: Live mode was selected, but live mode URL not set
+# 202: Paper mode was selected, but paper mode URL not set
 
 # Constants:
 readonly default_paper_url="https://paper-api.alpaca.markets"
 readonly default_live_url=""
-readonly conf_file="~/.bashtraderrc"
+readonly conf_file="$HOME/.bashtraderrc"
 
 # Inclusions:
 # Simple system to tell included code not to run unless included by us
 readonly ____bashTrader_is_running____=yes
-source "$conf_file" > /dev/null 2>&1 || no_conf_file=yes
+if [ -f "$conf_file" -a -r "$conf_file" ]; then
+	source "$conf_file"
+	readonly have_conf_file=yes
+fi
 source ticktick.sh	# For processing JSON
 source logs-errors.sh	# Logging and error handling code (okay, it also handles warnings)
 source send_receive.sh	# Functions that send or receive transactions to/from the brokerage
 source processors.sh	# Data processing functions
 
 # Test mode things
-if [ -n "$testMode" ]; then
+if [ "$testMode" != "no" ]; then
 e_warn "Operating in test mode!"	# Tell the user
 # Extra protection, in case an operation somewhere forgets to check $testMode
 alias curl=/bin/false
 fi
 
 # Report on the loading of the user configuration file
-[ -n "$no_conf_file" ] && e_warn "No user configuration file found; using defaults."
+[ -z "$have_conf_file" ] && e_warn "No user configuration file found; using defaults."
 
-# Configures for paper or live mode
-if [ "$live" = "yes" ]; then
-e_error "Live mode was selected, but live mode URL not set." 201
+# Configures for, and sanity checks, paper or live mode
+if [ "$live" = "YES" ]; then
+	[ -z "${live_url:-$default_live_url}" ] && e_error "Live mode was selected, but live mode URL not set." 201
+	readonly tradingURL="${live_url:-$default_live_url}"
+	[ -z "$live_keyID" ] && e_error "No live Key ID was set." 1
+	readonly keyID="$live_keyID"
+	[ -z "$live_secretKey" ] && e_error "No live secret Key was set." 1
+	readonly secretKey="$live_secretKey"
+	# FixMe: should be configurable with a commandline switch or something
+	# FixMe: should log.
+	echo 1>&2 'Rigged for live trading!'
 else	# Paper trading mode by default
-readonly tradingURL="${paper_url:-$default_paper_url}"
+	[ -z "${paper_url:-$default_paper_url}" ] && e_error "paper mode was selected, but paper mode URL not set." 201
+	readonly tradingURL="${paper_url:-$default_paper_url}"
+	[ -z "$paper_keyID" ] && e_error "No paper Key ID was set." 1
+	readonly keyID="$paper_keyID"
+	[ -z "$paper_secretKey" ] && e_error "No paper secret Key was set." 1
+	readonly secretKey="$paper_secretKey"
+	# FixMe: should be configurable with a commandline switch or something
+	# FixMe: should log.
+	echo 1>&2 'Configured for paper trading, go wild!'
 fi
 
 # Gets a word from the user and returns it

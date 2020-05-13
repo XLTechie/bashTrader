@@ -2,16 +2,19 @@
 # Part of the bashTrader package: https://github.com/XLTechie/bashTrader
 # Copyright 2020, Luke Davis, all rights reserved.
 
-# There are two modes you can operate in: paper trading mode or live trading mode. Paper is the default. Set to yes if you want to use real money!
-#live=yes
+# There are two modes you can operate in: paper trading mode or live trading mode. Paper is the default. Set to YES if you want to use real money!
+#live=NO
 
 # Set these to your actual values, as obtained from the Alpaca web interface. These have no defaults.
-paper_KeyID=""
+paper_keyID=""
 paper_secretKey=""
 #
-live_KeyID=""
+live_keyID=""
 live_secretKey=""
 
 # These have defaults; leave them alone unless you have good reason.
 #paper_url="https://paper-api.alpaca.markets"
 #live_url="https://api.alpaca.markets"
+
+# For debugging; should be gone in production
+#readonly testMode=no   # If we want to be able to contact the brokerage, set this to no. Defaults yes.
