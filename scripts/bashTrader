@@ -3,26 +3,53 @@
 
 set -e
 
+# User Configuration:
+readonly testMode=yes	# If we want to run without actually contacting the brokerage, set this
+logFile="/dev/null"	# Not implemented
+readonly debugging=0	# Not implemented
+live=no	# If yes, we are in live trading mode; paper trading for anything else. Can be overridden from the user config
+
+# Error states:
+# 2: CURL failed
+# 200: Trading URL not set
+# 201: Live mode was selected, but live mode URL not set
+
+# Constants:
+readonly default_paper_url="https://paper-api.alpaca.markets"
+readonly default_live_url=""
+readonly conf_file="~/.bashtraderrc"
+
+# Inclusions:
 # Simple system to tell included code not to run unless included by us
-____bashTrader_is_running____=yes
+readonly ____bashTrader_is_running____=yes
+source "$conf_file" > /dev/null 2>&1 || no_conf_file=yes
+source ticktick.sh	# For processing JSON
+source logs-errors.sh	# Logging and error handling code (okay, it also handles warnings)
+source send_receive.sh	# Functions that send or receive transactions to/from the brokerage
+source processors.sh	# Data processing functions
 
-source ticktick.sh		# For processing JSON
-source support_functions.sh	# Various support animals
+# Test mode things
+if [ -n "$testMode" ]; then
+e_warn "Operating in test mode!"	# Tell the user
+# Extra protection, in case an operation somewhere forgets to check $testMode
+alias curl=/bin/false
+fi
 
+# Report on the loading of the user configuration file
+[ -n "$no_conf_file" ] && e_warn "No user configuration file found; using defaults."
+
+# Configures for paper or live mode
+if [ "$live" = "yes" ]; then
+e_error "Live mode was selected, but live mode URL not set." 201
+else	# Paper trading mode by default
+readonly tradingURL="${paper_url:-$default_paper_url}"
+fi
 
 # Gets a word from the user and returns it
 function readMore {
 local returnable
 read returnable
 echo "$returnable"
-}
-
-# Requestors:
-# Each takes a handler, followed by an endpoint (the part at the end of the URL).
-# Some may also take parameters.
-
-# Sends a simple request, with no parameters
-function r_simple {
 }
 
 
@@ -36,8 +63,19 @@ v) # Account values
 echo "Valuable!"
 ;;
 
-q)
-echo "Get a quote"
+C) # Clear the symbol
+unset symbol
+echo Symbol cleared.
+;;
+
+q)	# Get a simple quote
+#set -x
+# If the symble isn't already set, get it
+while [ -z "$symbol" ]; do
+read -rp "Symbol: " symbol _
+done
+r_simple 2/assets "$symbol"
+tickVars -nli
 ;;
 
 b)

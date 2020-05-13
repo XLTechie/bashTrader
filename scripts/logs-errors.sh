@@ -4,7 +4,7 @@
 
 # Takes error text to be shown, and an optional exit code
 function e_error {
-echo 1>&2 "$1"
+echo 1>&2 "Error at line ${BASH_LINENO[$i]} of ${BASH_SOURCE[$i+1]}: $1"
 # FixMe: should log something if logging is enabled
 [ -z "$2" ] && exit 255
 if [ "$2" -lt 1 -o "$2" -gt 255 ]; then
