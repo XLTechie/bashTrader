@@ -52,25 +52,27 @@ fi
 # Configures for, and sanity checks, paper or live mode
 if [ "$live" = "YES" ]; then
 	[ -z "${live_url:-$default_live_url}" ] && e_error "Live mode was selected, but live mode URL not set." 201
-	readonly tradingURL="${live_url:-$default_live_url}"
+	readonly APCA_API_BASE_URL="${live_url:-$default_live_url}"
 	[ -z "$live_keyID" ] && e_error "No live Key ID was set." 1
-	readonly keyID="$live_keyID"
+	readonly APCA_API_KEY_ID="$live_keyID"
 	[ -z "$live_secretKey" ] && e_error "No live secret Key was set." 1
-	readonly secretKey="$live_secretKey"
+	readonly APCA_API_SECRET_KEY="$live_secretKey"
 	# FixMe: should be configurable with a commandline switch or something
 	# FixMe: should log.
 	echo 1>&2 'Rigged for live trading!'
 else	# Paper trading mode by default
 	[ -z "${paper_url:-$default_paper_url}" ] && e_error "paper mode was selected, but paper mode URL not set." 201
-	readonly tradingURL="${paper_url:-$default_paper_url}"
+	readonly APCA_API_BASE_URL="${paper_url:-$default_paper_url}"
 	[ -z "$paper_keyID" ] && e_error "No paper Key ID was set." 1
-	readonly keyID="$paper_keyID"
+	readonly APCA_API_KEY_ID="$paper_keyID"
 	[ -z "$paper_secretKey" ] && e_error "No paper secret Key was set." 1
-	readonly secretKey="$paper_secretKey"
+	readonly APCA_API_SECRET_KEY="$paper_secretKey"
 	# FixMe: should be configurable with a commandline switch or something
 	# FixMe: should log.
 	echo 1>&2 'Configured for paper trading, go wild!'
 fi
+# Minimal security provision
+export -n APCA_API_BASE_URL APCA_API_KEY_ID APCA_API_SECRET_KEY
 
 # Gets a word from the user and returns it
 function readMore {
