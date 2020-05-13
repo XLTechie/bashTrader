@@ -23,7 +23,7 @@ URL="${tradingURL}/GET/V$1"
 # FixMe: should log the URL here
 
 # Submit the request, unless this is test mode, in which case don't
-if [ -z "$testMode" ]; then
+if [ "$testMode" = "no" ]; then
 export APCA_API_BASE_URL APCA_API_KEY_ID APCA_API_SECRET_KEY
 incoming=`curl $URL` || \
 e_error "CURL failed!" 2
