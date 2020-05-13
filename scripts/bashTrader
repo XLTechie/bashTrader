@@ -117,7 +117,7 @@ S)
 echo "Shorter than ever"
 ;;
 
-.)
+.|Q)
 break
 ;;
 
