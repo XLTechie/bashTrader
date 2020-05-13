@@ -16,9 +16,6 @@ testModeData='{"testMode": "true","reality": "none","array": ["this","contains",
 function r_simple {
 local incoming
 
-# Sanity checks
-[ -z "$tradingURL" ] && e_error "Trading URL not set." 200
-
 # Construct the URL from the base URL and the provided endpoint
 URL="${tradingURL}/GET/V$1"
 # Add the request parameters, if any
