@@ -25,7 +25,7 @@ testMode=yes	# Local only mode; configure in user config for now, and set to no 
 
 # Constants:
 readonly default_paper_url="https://paper-api.alpaca.markets"
-readonly default_live_url=""
+readonly default_live_url="https://api.alpaca.markets"
 readonly conf_file="$HOME/.bashtraderrc"
 
 # Inclusions:
