@@ -6,7 +6,7 @@
 function e_error {
 echo 1>&2 "Error at line ${BASH_LINENO[$i]} of ${BASH_SOURCE[$i+1]}: $1"
 # FixMe: should log something if logging is enabled
-[ -z "$2" ] && exit 255
+[[ -z "$2" ]] && exit 255
 if [ "$2" -lt 1 -o "$2" -gt 255 ]; then
 echo 1>2 "Additionally, a bad error exit code was given: $2"
 exit 255
@@ -15,7 +15,7 @@ fi
 }
 
 function e_warn {
-if [ -z "$1" ]; then
+if [[ -z "$1" ]]; then
 e_warn "A warning was issued, but no warning text was given."
 else
 echo 1>&2 "$1"

@@ -1,8 +1,10 @@
 # simplePrint: prints a human friendly listing of the passed JSON object
 # keySplitter: returns an array of the provided JSON key elements (subtracting TickTickisms)
 # catchErrorMessage: looks for errors in the returned JSON, prints them, and clears the JSON
+# getSymbol: gets, or sets then gets, the working symbol
+
 # Simple no-op to prevent running in other than our expected environment
-[ -z "$____bashTrader_is_running____" ] && { echo 1>&2 "This is meant to be included in bashTrader; exiting!"; exit 255; }
+[[ -z "$____bashTrader_is_running____" ]] && { echo 1>&2 "This is meant to be included in bashTrader; exiting!"; exit 255; }
 
 #Takes the array we want to split into, and the key we want split
 function keySplitter {
@@ -29,7 +31,7 @@ done
 # Looks for errors in the returned JSON, prints them, and clears the JSON.
 # Returns true if it did anything, false if not.
 function catchErrorMessage {
-if [ -n "``message``" ]; then
+if [[ -n "``message``" ]]; then
 echo "Error! ``message``"
 ``message.delete()``
 ``code.delete()``
@@ -38,3 +40,15 @@ else return 1
 fi
 }
 
+# If a symbol is set, it returns it on STDOUT.
+# If no symbol is set (in $symbol from the parent environment), request one from the user.
+# It also sets $symbol to whatever it gets, in case it is not being called in a subshell and that is desired.
+# However the intended usage is: "${symbol:=`getSymbol`}"
+function getSymbol {
+declare -gu symbol
+# If the symble isn't already set, get it
+while [[ -z "$symbol" ]]; do
+read -rp "Symbol: " symbol _
+done
+echo "$symbol"
+}

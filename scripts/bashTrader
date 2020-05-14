@@ -24,10 +24,13 @@ testMode=yes	# Local only mode; configure in user config for now, and set to no 
 # 202: Paper mode was selected, but paper mode URL not set
 # 203: data URL not set
 
+# Declarations for variables with special attributes
+declare -gux symbol	# Symbol has special attributes: capitalization and exportation
+
 # Constants:
 readonly default_paper_url="https://paper-api.alpaca.markets"
 readonly default_live_url="https://api.alpaca.markets"
-readonly default_data_url="https://data.alpaca.markets/v1"
+readonly default_data_url="https://data.alpaca.markets"
 readonly conf_file="$HOME/.bashtraderrc"
 
 # Inclusions:
@@ -46,32 +49,32 @@ source processors.sh	# Data processing functions
 alias curl='curl -qsS --retry 1 -m 3 --proto =https -o -'
 
 # Test mode things
-if [ "$testMode" != "no" ]; then
+if [[ "$testMode" != "no" ]]; then
 e_warn "Operating in test mode!"	# Tell the user
 # Extra protection, in case an operation somewhere forgets to check $testMode
 alias curl=/bin/false
 fi
 
 # Report on the loading of the user configuration file
-[ -z "$have_conf_file" ] && e_warn "No user configuration file found; using defaults."
+[[ -z "$have_conf_file" ]] && e_warn "No user configuration file found; using defaults."
 
 # Configures for, and sanity checks, paper or live mode
-if [ "$live" = "YES" ]; then
-	[ -z "${live_url:-$default_live_url}" ] && e_error "Live mode was selected, but live mode URL not set." 201
+if [[ "$live" = "YES" ]]; then
+	[[ -z "${live_url:-$default_live_url}" ]] && e_error "Live mode was selected, but live mode URL not set." 201
 	readonly APCA_API_BASE_URL="${live_url:-$default_live_url}"
-	[ -z "$live_keyID" ] && e_error "No live Key ID was set." 1
+	[[ -z "$live_keyID" ]] && e_error "No live Key ID was set." 1
 	readonly APCA_API_KEY_ID="$live_keyID"
-	[ -z "$live_secretKey" ] && e_error "No live secret Key was set." 1
+	[[ -z "$live_secretKey" ]] && e_error "No live secret Key was set." 1
 	readonly APCA_API_SECRET_KEY="$live_secretKey"
 	# FixMe: should be configurable with a commandline switch or something
 	# FixMe: should log.
 	echo 1>&2 'Rigged for live trading!'
 else	# Paper trading mode by default
-	[ -z "${paper_url:-$default_paper_url}" ] && e_error "paper mode was selected, but paper mode URL not set." 201
+	[[ -z "${paper_url:-$default_paper_url}" ]] && e_error "paper mode was selected, but paper mode URL not set." 201
 	readonly APCA_API_BASE_URL="${paper_url:-$default_paper_url}"
-	[ -z "$paper_keyID" ] && e_error "No paper Key ID was set." 1
+	[[ -z "$paper_keyID" ]] && e_error "No paper Key ID was set." 1
 	readonly APCA_API_KEY_ID="$paper_keyID"
-	[ -z "$paper_secretKey" ] && e_error "No paper secret Key was set." 1
+	[[ -z "$paper_secretKey" ]] && e_error "No paper secret Key was set." 1
 	readonly APCA_API_SECRET_KEY="$paper_secretKey"
 	# FixMe: should be configurable with a commandline switch or something
 	# FixMe: should log.
@@ -80,7 +83,7 @@ fi
 # Minimal security provision
 export -n APCA_API_KEY_ID APCA_API_SECRET_KEY
 
-if [ -n "${data_url:-$default_data_url}" ]; then
+if [[ -n "${data_url:-$default_data_url}" ]]; then
 readonly dataURL="${data_url:-$default_data_url}"
 else
 e_error "Data URL not set." 203
@@ -92,7 +95,6 @@ local returnable
 read returnable
 echo "$returnable"
 }
-
 
 # Main loop
 while read -srN1 command; do
@@ -106,44 +108,45 @@ catchErrorMessage || tickVars -nli
 tickReset
 ;;
 
-v) # Account values
-echo "Valuable!"
+c)	# Clear the screen
+clear
 ;;
 
 C) # Clear the symbol
-unset symbol
+symbol=""
 echo Symbol cleared.
 ;;
 
-q)	# Get a simple quote
-# If the symble isn't already set, get it
-while [ -z "$symbol" ]; do
-read -rp "Symbol: " symbol _
-symbol=${symbol^^}	# Needs to be uppercase
-done
-r_simple 2/assets "$symbol"
+p)	# Get symbol profile and tradability
+r_simple 2/assets "${symbol:=`getSymbol`}"
 catchErrorMessage || tickVars -nli
 tickReset
 ;;
 
-b)
-echo "Buy buy buy!"
+q)	# Get a basic quote
+r_simpleData 1/last_quote/stocks "${symbol:=`getSymbol`}"
+catchErrorMessage || \
+echo $(bc -l <<<"scale=2;(``last.bidprice``+``last.askprice``)/2")" (``last.bidprice``-``last.askprice``)"
+tickReset
 ;;
 
-s)
-echo 'Sell sell sell!'
+Q)	# Get a detailed quote
+r_simpleData 1/last_quote/stocks "${symbol:=`getSymbol`}"
+catchErrorMessage || tickVars -nli
+tickReset
 ;;
 
-S)
-echo "Shorter than ever"
+s)	# Print current symbol
+echo $symbol
+;;
+
+S)	# Unconditionally change the current symbol
+symbol=''
+symbol=`getSymbol`
 ;;
 
 .)
 break
-;;
-
-*)
-echo "What?"
 ;;
 
 esac
