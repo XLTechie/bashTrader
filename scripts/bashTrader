@@ -22,10 +22,12 @@ testMode=yes	# Local only mode; configure in user config for now, and set to no 
 # 200: Trading URL not set
 # 201: Live mode was selected, but live mode URL not set
 # 202: Paper mode was selected, but paper mode URL not set
+# 203: data URL not set
 
 # Constants:
 readonly default_paper_url="https://paper-api.alpaca.markets"
 readonly default_live_url="https://api.alpaca.markets"
+readonly default_data_url="https://data.alpaca.markets/v1"
 readonly conf_file="$HOME/.bashtraderrc"
 
 # Inclusions:
@@ -76,7 +78,13 @@ else	# Paper trading mode by default
 	echo 1>&2 'Configured for paper trading, go wild!'
 fi
 # Minimal security provision
-export -n APCA_API_BASE_URL APCA_API_KEY_ID APCA_API_SECRET_KEY
+export -n APCA_API_KEY_ID APCA_API_SECRET_KEY
+
+if [ -n "${data_url:-$default_data_url}" ]; then
+readonly dataURL="${data_url:-$default_data_url}"
+else
+e_error "Data URL not set." 203
+fi
 
 # Gets a word from the user and returns it
 function readMore {

@@ -15,6 +15,7 @@ live_secretKey=""
 # These have defaults; leave them alone unless you have good reason.
 #paper_url="https://paper-api.alpaca.markets"
 #live_url="https://api.alpaca.markets"
+#data_url="https://data.alpaca.markets/v1"
 
 # For debugging; should be gone in production
 #readonly testMode=no   # If we want to be able to contact the brokerage, set this to no. Defaults yes.
