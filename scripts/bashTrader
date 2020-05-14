@@ -95,6 +95,7 @@ case $command in
 a)	# Account
 r_simple 2/account
 catchErrorMessage || tickVars -nli
+tickReset
 ;;
 
 v) # Account values
@@ -110,9 +111,11 @@ q)	# Get a simple quote
 # If the symble isn't already set, get it
 while [ -z "$symbol" ]; do
 read -rp "Symbol: " symbol _
+symbol=${symbol^^}	# Needs to be uppercase
 done
 r_simple 2/assets "$symbol"
 catchErrorMessage || tickVars -nli
+tickReset
 ;;
 
 b)
@@ -127,7 +130,7 @@ S)
 echo "Shorter than ever"
 ;;
 
-.|Q)
+.)
 break
 ;;
 
