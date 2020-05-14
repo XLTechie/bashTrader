@@ -26,9 +26,8 @@ URL="${APCA_API_BASE_URL}/v$1"
 # Submit the request, unless this is test mode, in which case don't
 if [ "$testMode" = "no" ]; then
 export APCA_API_KEY_ID APCA_API_SECRET_KEY
-incoming=`curl $URL` || \
+incoming=`curl -X GET -H "APCA-API-KEY-ID: $APCA_API_KEY_ID" -H "APCA-API-SECRET-KEY: $APCA_API_SECRET_KEY" $URL` || \
 e_error "CURL failed!" 2
-export -n APCA_API_KEY_ID APCA_API_SECRET_KEY
 else # Generate fake data
 incoming="$testModeData"
 fi
