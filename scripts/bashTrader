@@ -7,6 +7,7 @@
 # That said, if you like this project and want to contribute, I welcome it. Email me or submit a pull request.
 
 set -e
+shopt -s extglob
 
 # Early stage user Configuration:
 # (FixMe: remove in "production" release)
@@ -44,6 +45,7 @@ if [ -f "$conf_file" -a -r "$conf_file" ]; then
 	readonly have_conf_file=yes
 fi
 source ticktick.sh	# For processing JSON
+set -x
 source logs-errors.sh	# Logging and error handling code (okay, it also handles warnings)
 source send_receive.sh	# Functions that send or receive transactions to/from the brokerage
 source processors.sh	# Data processing functions
@@ -109,10 +111,10 @@ echo "$returnable"
 }
 
 # Main loop
-while read -srN1 command; do
+while read -srN1 command; do #{
 
 # Main commands
-case $command in
+case $command in #{
 
 a)	# Account
 r_simple 2/account
@@ -121,10 +123,15 @@ tickReset
 ;;
 
 b)	# Buy buy buy
-mkOrder $(getSymbol) | r_post 2/orders
-catchJSONMessage || \
-echo $(bc -l <<<"scale=2;(``last.bidprice``+``last.askprice``)/2")" (``last.bidprice``-``last.askprice``)"
+symbol=`getSymbol`
+order=$(mkOrder buy $symbol)
+if [[ -n "$order" ]]; then	# Act only if we got an order back
+echo 1>&2 'ordering!'
+r_post 2/orders <<<"$order"
+catchJSONMessage
 tickReset
+else echo 1>&2 'Not ordering.'
+fi
 ;;
 
 c)	# Clear the screen
@@ -177,7 +184,7 @@ symbol=`getSymbol`
 break
 ;;
 
-esac
+esac #}
 
 unset command
-done
+done #}

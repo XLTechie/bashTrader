@@ -10,7 +10,7 @@
 # * Callback options: the rest of the parameters are given as options to the callback.
 
 # Contains the JSON result of an artificial generic request, to be used in test mode
-testModeData='{"testMode": "true","reality": "none","array": ["this","contains","nothing"],"object":{"having":"nothing","purpose":"none"}}'
+testModeData='{"testMode":"true","ar":["behold","nothing"],"obj_tree":{"having":"nothing"}}'
 
 # Sends a simple request
 function r_simple {
