@@ -79,8 +79,8 @@ URL="${APCA_API_BASE_URL}/v$1"
 
 # Submit the request, unless this is test mode, in which case don't
 if [[ "$testMode" = "no" ]]; then
-export APCA_API_KEY_ID APCA_API_SECRET_KEY
-incoming=`$curl "${curlOpts[@]}" -X GET "$URL"		` || \
+# Curl will read STDIN for post contents. Suggest passing it with a here string.
+incoming=`$curl "${curlOpts[@]}" -X POST --data-binary @- "$URL"		` || \
 e_error "CURL failed!" 2
 else # Generate fake data
 incoming="$testModeData"
