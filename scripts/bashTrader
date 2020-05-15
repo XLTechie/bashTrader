@@ -7,7 +7,6 @@
 # That said, if you like this project and want to contribute, I welcome it. Email me or submit a pull request.
 
 set -e
-shopt -s expand_aliases
 
 # Early stage user Configuration:
 # (FixMe: remove in "production" release)
@@ -33,6 +32,9 @@ readonly default_live_url="https://api.alpaca.markets"
 readonly default_data_url="https://data.alpaca.markets"
 readonly conf_file="$HOME/.bashtraderrc"
 
+# Commands
+curl=`which curl`	# Also see $curlOpts later
+
 # Inclusions:
 # Simple system to tell included code not to run unless included by us
 readonly ____bashTrader_is_running____=yes
@@ -45,14 +47,11 @@ source logs-errors.sh	# Logging and error handling code (okay, it also handles w
 source send_receive.sh	# Functions that send or receive transactions to/from the brokerage
 source processors.sh	# Data processing functions
 
-# CURLisms
-alias curl='curl -qsS --retry 1 -m 3 --proto =https -o -'
-
 # Test mode things
 if [[ "$testMode" != "no" ]]; then
 e_warn "Operating in test mode!"	# Tell the user
 # Extra protection, in case an operation somewhere forgets to check $testMode
-alias curl=/bin/false
+$curl=/bin/false
 fi
 
 # Report on the loading of the user configuration file
@@ -88,6 +87,17 @@ readonly dataURL="${data_url:-$default_data_url}"
 else
 e_error "Data URL not set." 203
 fi
+
+# Configure CURL
+declare -rxa curlOpts=(
+-qsS
+--retry 1
+-m 3
+--proto =https
+-o -
+-H "APCA-API-KEY-ID: $APCA_API_KEY_ID"
+-H "APCA-API-SECRET-KEY: $APCA_API_SECRET_KEY"
+)
 
 # Gets a word from the user and returns it
 function readMore {
