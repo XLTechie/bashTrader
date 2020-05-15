@@ -21,7 +21,7 @@ URL="${APCA_API_BASE_URL}/v$1"
 # Add the request parameters, if any
 [[ -n "$2" ]] && URL+="/$2"
 # FixMe: should log the URL here
-##echo 1>&2 "URL: $URL"
+#echo 1>&2 "URL: $URL"
 
 # Submit the request, unless this is test mode, in which case don't
 if [[ "$testMode" = "no" ]]; then
@@ -30,6 +30,13 @@ incoming=`curl -X GET -H "APCA-API-KEY-ID: $APCA_API_KEY_ID" -H "APCA-API-SECRET
 e_error "CURL failed!" 2
 else # Generate fake data
 incoming="$testModeData"
+fi
+
+#echo 1>&2 $? "$incoming"
+
+# If the response was empty, tell the user
+if [ -z "$incoming" -o "$incoming" = "[]" -o "$incoming" = "{}" ]; then
+incoming='{"message":"None"}'
 fi
 
 # Convert our data into a usable JSON object

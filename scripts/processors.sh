@@ -1,6 +1,5 @@
 # simplePrint: prints a human friendly listing of the passed JSON object
 # keySplitter: returns an array of the provided JSON key elements (subtracting TickTickisms)
-# catchErrorMessage: looks for errors in the returned JSON, prints them, and clears the JSON
 # getSymbol: gets, or sets then gets, the working symbol
 
 # Simple no-op to prevent running in other than our expected environment
@@ -27,19 +26,6 @@ keySplitter keys "$item"
 echo "${keys[-1]}: ${!item}"
 done
 }
-
-# Looks for errors in the returned JSON, prints them, and clears the JSON.
-# Returns true if it did anything, false if not.
-function catchErrorMessage {
-if [[ -n "``message``" ]]; then
-echo "Error! ``message``"
-``message.delete()``
-``code.delete()``
-return 0
-else return 1
-fi
-}
-
 # If a symbol is set, it returns it on STDOUT.
 # If no symbol is set (in $symbol from the parent environment), request one from the user.
 # It also sets $symbol to whatever it gets, in case it is not being called in a subshell and that is desired.

@@ -104,7 +104,7 @@ case $command in
 
 a)	# Account
 r_simple 2/account
-catchErrorMessage || tickVars -nli
+catchJSONMessage || tickVars -nli
 tickReset
 ;;
 
@@ -117,22 +117,34 @@ symbol=""
 echo Symbol cleared.
 ;;
 
-p)	# Get symbol profile and tradability
-r_simple 2/assets "${symbol:=`getSymbol`}"
-catchErrorMessage || tickVars -nli
+o)	# Open orders
+r_simple 2/orders
+catchJSONMessage || tickVars -nli
 tickReset
 ;;
 
-q)	# Get a basic quote
+p)	# Positions
+r_simple 2/positions
+catchJSONMessage || tickVars -nli
+tickReset
+;;
+
+P)	# Get symbol profile and tradability
+r_simple 2/assets "${symbol:=`getSymbol`}"
+catchJSONMessage || tickVars -nli
+tickReset
+;;
+
+q|'')	# Get a basic quote
 r_simpleData 1/last_quote/stocks "${symbol:=`getSymbol`}"
-catchErrorMessage || \
+catchJSONMessage || \
 echo $(bc -l <<<"scale=2;(``last.bidprice``+``last.askprice``)/2")" (``last.bidprice``-``last.askprice``)"
 tickReset
 ;;
 
 Q)	# Get a detailed quote
 r_simpleData 1/last_quote/stocks "${symbol:=`getSymbol`}"
-catchErrorMessage || tickVars -nli
+catchJSONMessage || tickVars -nli
 tickReset
 ;;
 
