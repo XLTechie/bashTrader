@@ -1,4 +1,4 @@
-# simplePrint: prints a human friendly listing of the passed JSON object
+# simplePrint: prints a human friendly listing of the passed JSON object, using only the most RHS keys
 # keySplitter: returns an array of the provided JSON key elements (subtracting TickTickisms)
 # getSymbol: gets, or sets then gets, the working symbol
 
@@ -26,15 +26,22 @@ keySplitter keys "$item"
 echo "${keys[-1]}: ${!item}"
 done
 }
+
 # If a symbol is set, it returns it on STDOUT.
 # If no symbol is set (in $symbol from the parent environment), request one from the user.
 # It also sets $symbol to whatever it gets, in case it is not being called in a subshell and that is desired.
 # However the intended usage is: "${symbol:=`getSymbol`}"
+# If the symbol appears to be an ID (longer than 10 characters), it is left alone. Otherwise it is forced to all caps.
 function getSymbol {
-declare -gu symbol
+declare -g symbol
+
 # If the symble isn't already set, get it
 while [[ -z "$symbol" ]]; do
 read -rp "Symbol: " symbol _
 done
+
+# Capitalize if this looks like an ID
+[[ ${#symbol} -lt 11 ]] && symbol="${symbol^^}"
+
 echo "$symbol"
 }

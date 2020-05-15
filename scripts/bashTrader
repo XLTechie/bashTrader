@@ -18,13 +18,14 @@ testMode=yes	# Local only mode; configure in user config for now, and set to no 
 # Error states:
 # 1: Key not set error.
 # 2: CURL failed
+# 10: Order without a symbol
 # 200: Trading URL not set
 # 201: Live mode was selected, but live mode URL not set
 # 202: Paper mode was selected, but paper mode URL not set
 # 203: data URL not set
 
 # Declarations for variables with special attributes
-declare -gux symbol	# Symbol has special attributes: capitalization and exportation
+declare -x symbol
 
 # Constants:
 readonly default_paper_url="https://paper-api.alpaca.markets"
@@ -115,6 +116,13 @@ case $command in
 a)	# Account
 r_simple 2/account
 catchJSONMessage || tickVars -nli
+tickReset
+;;
+
+b)	# Buy buy buy
+mkOrder $(getSymbol) | r_post 2/orders
+catchJSONMessage || \
+echo $(bc -l <<<"scale=2;(``last.bidprice``+``last.askprice``)/2")" (``last.bidprice``-``last.askprice``)"
 tickReset
 ;;
 
