@@ -43,16 +43,19 @@ tickReset
 # side symbol type
 function mkOrder {
 local side sym type
+# We need this for patterns, but can't accidentally leave it on--Ticktick doesn't like it for some reason
+shopt -s extglob
+trap "shopt -u extglob" RETURN
 
 # A symbol should have been passed in. If not, use the global symbol. If none, fail.
 sym="${2:-$symbol}"
 [[ -z "$sym" ]] && e_error "Attempted to build an order without a symbol!" 10
 
 # Configure the side
-if [[ "$1" == buy || "$1" == sell ]]; then #{
+if [[ "$1" == @(buy|sell) ]]; then #{
 side="$1"
 else	# Get the side #}{
-while [[ "$side" != "buy" && "$side" != "sell" ]]; do #{
+while [[ "$side" != @(buy|sell) ]]; do #{
 read -srN1 -p "Side: " side
 echo
 case "$side" in #{
@@ -101,5 +104,5 @@ esac #}
 done #}
 fi #}
 
-echo 1>&2 "side=$side, type=$type"
+
 }
