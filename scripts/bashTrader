@@ -160,6 +160,7 @@ tickReset
 ;;
 
 q|'')	# Get a basic quote
+[[ -z "$symbol" ]] && symbol=`getSymbol`
 getQuote -c
 ;;
 

@@ -1,4 +1,5 @@
 # mkOrder: Constructs an order from known information and user input
+# getQuote: returns basic quote(s) for the current symbol
 
 # Simple no-op to prevent running in other than our expected environment
 [[ -z "$____bashTrader_is_running____" ]] && { echo 1>&2 "This is meant to be included in bashTrader; exiting!"; exit 255; }
@@ -6,10 +7,15 @@
 # With no options, returns the average quote.
 # -b gets bid, -a gets ask, -c combined (quote, bid, ask)
 # Behavior is undefined if more than one such option is provided, but only one number will be returned.
-# Gets the global symbol, or asks for it.
+# Uses the global symbol, or fails.
 function getQuote {
-r_simpleData 1/last_quote/stocks "${symbol:-`getSymbol`}"
-catchJSONMessage && return 1
+if [[ -z "$symbol" ]]; then	#{
+e_warn "Requested a quote with no symbol"
+return 1
+fi	#}
+
+r_simpleData 1/last_quote/stocks "$symbol"
+catchJSONMessage && return
 
 OPTIND=1
 while getopts :cab option; do	#{
