@@ -2,4 +2,5 @@ Add a dependency list.
 - TickTick.sh (My version)
 - curl
 - bc
-
+- sed
+- grep

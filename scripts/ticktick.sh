@@ -454,7 +454,7 @@ if [[ $__tick_var_tokenized ]]; then
       done
 
     [[ -z "$sup_ln_number" ]] && echo "@ Line `caller | sed s/\ NULL//`:"
-    set | sed -n /^__tick_data/s/^__tick_data_/"$indent"/p
+    set | sed -nr /^__tick_data_/s/^__tick_data_/"$indent"/p
     [[ -z "$sup_trailing_nl" ]] && echo
     return 0
   }

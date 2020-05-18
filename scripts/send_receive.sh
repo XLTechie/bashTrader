@@ -78,13 +78,13 @@ URL="${APCA_API_BASE_URL}/v$1"
 #echo 1>&2 "URL: $URL"
 
 # Submit the request, unless this is test mode, in which case don't
-if [[ "$testMode" = "no" ]]; then
+if [[ "$testMode" = "no" ]]; then	#{
 # Curl will read STDIN for post contents. Suggest passing it with a here string.
 incoming=`$curl "${curlOpts[@]}" -X POST --data-binary @- "$URL"		` || \
 e_error "CURL failed!" 2
-else # Generate fake data
+else # Generate fake data	#}{
 incoming="$testModeData"
-fi
+fi	#}
 
 #echo 1>&2 $? "$incoming"
 

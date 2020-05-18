@@ -42,19 +42,64 @@ tickReset
 # Parameters:
 # side symbol type
 function mkOrder {
-local side sym type
+local side sym type qty
+
 # We need this for patterns, but can't accidentally leave it on--Ticktick doesn't like it for some reason
 shopt -s extglob
 trap "shopt -u extglob" RETURN
 
-# A symbol should have been passed in. If not, use the global symbol. If none, fail.
-sym="${2:-$symbol}"
+# q)uantity, b)uy, s)ell, M)arket, L)imit, S)top
+OPTIND=1
+while getopts "q:bsMLS" option; do #{
+
+case $option in #{
+
+b) # buy
+side=buy
+;;
+
+s) # Sell
+side=sell
+;;
+
+q)	# Quantity
+if [[ "$OPTARG" =~ ^[1-9][0-9]*$ ]]; then #{
+qty=$OPTARG
+else	#}{
+e_warn "$Invalid quantity ($OPTARG)."
+fi	#}
+;;
+
+M)	# Type: market
+type=market
+;;
+
+L)	# Type: limit
+type=limit
+;;
+
+S)	# Type: stop
+type=stop
+;;
+
+esac #}
+done #}
+
+# Configure the symbol, which may have been passed as an option
+if [[ -n "${!OPTIND}" ]]; then # A potential symbol was passed in #{
+sym="${!OPTIND}"
+else	# It wasn't passed in; get  from environment #}{
+sym="$symbol"
+fi	#}
+# FixMe: can this test ever succeed?
 [[ -z "$sym" ]] && e_error "Attempted to build an order without a symbol!" 10
 
-# Configure the side
-if [[ "$1" == @(buy|sell) ]]; then #{
-side="$1"
-else	# Get the side #}{
+# If quantity wasn't set, get it
+while [[ ! $qty =~ ^[1-9][0-9]*$ ]]; do	#{
+read -rp "Quantity: " qty _
+done	#}
+
+# If side wasn't set by options, configure the side
 while [[ "$side" != @(buy|sell) ]]; do #{
 read -srN1 -p "Side: " side
 echo
@@ -75,12 +120,8 @@ echo 1>&2 -e "\nB: buy, s: sell, or c: cancel."
 ;;
 esac #}
 done #}
-fi #}
 
-# Configure the type
-if [[ "$3" == @(market|limit|stop|stop_limit) ]]; then #{
-type="$3"
-else	# Get the type #}{
+# Configure the type if it wasn't set by options
 while [[ "$type" != @(market|limit|stop|stop_limit) ]]; do #{
 read -srN1 -p "type: " type
 echo
@@ -93,16 +134,20 @@ type=limit
 ;;
 t|T|b|B|s|S)
 echo 1>&2 'Not implemented!'
+unset type
 ;;
 c|C)
+unset type
 return	# Do not create an order
 ;;
 *)
+unset type
 echo 1>&2 "m: market, l: limit, s: stop, t: stop-limit, b: braket, or c: cancel."
 ;;
 esac #}
 done #}
-fi #}
 
 
+# Debugging code until function complete
+echo 1>&2 "${side}ing $qty $sym at $price. $type order."
 }
