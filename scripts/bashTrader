@@ -47,6 +47,7 @@ source ticktick.sh	# For processing JSON
 source logs-errors.sh	# Logging and error handling code (okay, it also handles warnings)
 source send_receive.sh	# Functions that send or receive transactions to/from the brokerage
 source processors.sh	# Data processing functions
+source trading.sh	# Functions that setup trades, etc.
 
 # Test mode things
 if [[ "$testMode" != "no" ]]; then
