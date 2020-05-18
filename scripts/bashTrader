@@ -52,7 +52,7 @@ source processors.sh	# Data processing functions
 if [[ "$testMode" != "no" ]]; then
 e_warn "Operating in test mode!"	# Tell the user
 # Extra protection, in case an operation somewhere forgets to check $testMode
-$curl=/bin/false
+curl=/bin/true
 fi
 
 # Report on the loading of the user configuration file
