@@ -155,10 +155,7 @@ tickReset
 ;;
 
 q|'')	# Get a basic quote
-r_simpleData 1/last_quote/stocks "${symbol:=`getSymbol`}"
-catchJSONMessage || \
-echo $(bc -l <<<"scale=2;(``last.bidprice``+``last.askprice``)/2")" (``last.bidprice``-``last.askprice``)"
-tickReset
+getQuote -c
 ;;
 
 Q)	# Get a detailed quote
