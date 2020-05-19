@@ -54,9 +54,9 @@ local side sym type qty
 shopt -s extglob
 trap "shopt -u extglob" RETURN
 
-# q)uantity, b)uy, s)ell, M)arket, L)imit, S)top
+# q)uantity, b)uy, s)ell, M)arket, L)imit (price), S)top
 OPTIND=1
-while getopts "q:bsMLS" option; do #{
+while getopts "q:bsML:S" option; do #{
 
 case $option in #{
 
@@ -77,11 +77,13 @@ fi	#}
 ;;
 
 M)	# Type: market
-type=market
+readonly type=market
 ;;
 
 L)	# Type: limit
-type=limit
+readonly type=limit
+priceRequired=yes
+price="$OPTARG"	# This is checked for pricyness later
 ;;
 
 S)	# Type: stop
@@ -97,7 +99,6 @@ sym="${!OPTIND}"
 else	# It wasn't passed in; get  from environment #}{
 sym="$symbol"
 fi	#}
-# FixMe: can this test ever succeed?
 [[ -z "$sym" ]] && e_error "Attempted to build an order without a symbol!" 10
 
 # If quantity wasn't set, get it
@@ -137,6 +138,7 @@ type=market
 ;;
 l|L)
 type=limit
+priceRequired=yes
 ;;
 t|T|b|B|s|S)
 echo 1>&2 'Not implemented!'
@@ -153,7 +155,39 @@ echo 1>&2 "m: market, l: limit, s: stop, t: stop-limit, b: braket, or c: cancel.
 esac #}
 done #}
 
+# For a market order, we don't set a price. For everything else, we require one be passed or provided.
+if [[ -n "$priceRequired" ]]; then	#{
+# Check the price for pricyness, and if it doesn't look right, ask for it
+while [[ ! "$price" =~ ^[0-9]+(\.[0-9]{1,4})?$ ]]; do	#{
+echo 1>&2 "$symbol: `getQuote -c`"
+read -rp "Limit price: " price _
+done	#}
+fi	#}
 
-# Debugging code until function complete
-echo 1>&2 "${side}ing $qty $sym at $price. $type order."
+# We now have enough information to construct the order
+
+orderElements=(
+"symbol=$symbol"	# Quoted because it could be an ID, paranoia
+qty=$qty
+side=$side
+type=$type
+time_in_force=${timeInForce:-day}
+extended_hours=false	# FixMe: configure globally and set here with a default
+order_class=${class:-simple}	# simple, bracket, oco or oto
+)
+#take_profit { limit_price, stop_loss { stop_price, limit_price } }
+
+# Optionals, or pseudo-optionals
+[[ -n $price ]] && orderElements+=( limit_price=$price )
+[[ -n $stop ]] && orderElements+=( stop_price=$stop )
+[[ -n "$myOrderID" ]] && orderElements+=( client_order_id="$myOrderID" )
+
+# Things to be configured later
+#day, gtc, opg, cls, ioc, fok
+#[[ -n "$timeInForce" ]] && orderElements+=(time_in_force=$timeInForce)
+
+export IFS='&'
+order="${orderElements[*]}"
+
+echo "$order"
 }

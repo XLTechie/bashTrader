@@ -122,7 +122,7 @@ tickReset
 
 b)	# Buy buy buy
 symbol=`getSymbol`
-order=`mkOrder `
+order=`mkOrder -b $symbol`
 if [[ -n "$order" ]]; then	# Act only if we got an order back
 echo 1>&2 'ordering!'
 r_post 2/orders <<<"$order"
