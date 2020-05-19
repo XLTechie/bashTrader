@@ -48,7 +48,7 @@ tickReset
 # Parameters:
 # side symbol type
 function mkOrder {
-local side sym type qty
+local side sym type qty price 
 
 # We need this for patterns, but can't accidentally leave it on--Ticktick doesn't like it for some reason
 shopt -s extglob
@@ -165,29 +165,22 @@ done	#}
 fi	#}
 
 # We now have enough information to construct the order
+# At the moment, we do that by printing it to the caller
+printf '{
+"symbol": "%s",
+"qty": %s,
+"side": "%s",
+"type": "%s",
+"time_in_force": "%s",
+"extended_hours": %s,
+"order_class": "%s"%b%b%b
+}' $symbol $qty $side $type ${timeInForce:-day} ${extendedHours:-false} ${class:-simple} \
+${price:+",\n\"limit_price\": \"$price\""} ${stop:+",\n\"stop_price\": \"$stop\""} ${myOrderID:+",\n\"client_order_id\": \"$myOrderID\""} 
+#perl -pe 's|\n|\r\n|' > /tmp/order
 
-orderElements=(
-"symbol=$symbol"	# Quoted because it could be an ID, paranoia
-qty=$qty
-side=$side
-type=$type
-time_in_force=${timeInForce:-day}
-extended_hours=false	# FixMe: configure globally and set here with a default
-order_class=${class:-simple}	# simple, bracket, oco or oto
-)
+# order_class: simple, bracket, oco or oto
 #take_profit { limit_price, stop_loss { stop_price, limit_price } }
-
-# Optionals, or pseudo-optionals
-[[ -n $price ]] && orderElements+=( limit_price=$price )
-[[ -n $stop ]] && orderElements+=( stop_price=$stop )
-[[ -n "$myOrderID" ]] && orderElements+=( client_order_id="$myOrderID" )
-
 # Things to be configured later
 #day, gtc, opg, cls, ioc, fok
-#[[ -n "$timeInForce" ]] && orderElements+=(time_in_force=$timeInForce)
 
-export IFS='&'
-order="${orderElements[*]}"
-
-echo "$order"
 }

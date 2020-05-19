@@ -92,13 +92,15 @@ fi
 
 # Configure CURL
 declare -rxa curlOpts=(
--qsS
+-gqsS
 --retry 1
 -m 3
 --proto =https
 -o -
 -H "APCA-API-KEY-ID: $APCA_API_KEY_ID"
 -H "APCA-API-SECRET-KEY: $APCA_API_SECRET_KEY"
+${debugging:+--trace-ascii}
+${debugging:+"/tmp/curl.out"}
 )
 
 # Gets a word from the user and returns it
@@ -126,7 +128,7 @@ order=`mkOrder -b $symbol`
 if [[ -n "$order" ]]; then	# Act only if we got an order back
 echo 1>&2 'ordering!'
 r_post 2/orders <<<"$order"
-catchJSONMessage
+catchJSONMessage || :
 tickReset
 else echo 1>&2 'Not ordering.'
 fi
