@@ -122,9 +122,9 @@ catchJSONMessage || tickVars -nli
 tickReset
 ;;
 
-b)	# Buy buy buy
+b|s)	# Buy buy buy
 symbol=`getSymbol`
-order=`mkOrder -b $symbol`
+order=`mkOrder -$command $symbol`
 if [[ -n "$order" ]]; then	# Act only if we got an order back
 echo 1>&2 'ordering!'
 r_post 2/orders <<<"$order"
@@ -183,7 +183,7 @@ catchJSONMessage || tickVars -nli
 tickReset
 ;;
 
-s)	# Print current symbol
+y)	# Print current symbol
 echo $symbol
 ;;
 
