@@ -145,13 +145,19 @@ echo Symbol cleared.
 
 o)	# Open orders
 r_simple 2/orders
-catchJSONMessage || tickVars -nli
+catchJSONMessage || \
+mapfile -t results < <(tickVars -nli)
+printf '%s\n' "${results[@]/#0000000000/}"
+unset results
 tickReset
 ;;
 
 p)	# Positions
 r_simple 2/positions
-catchJSONMessage || tickVars -nli
+catchJSONMessage || \
+mapfile -t results < <(tickVars -nli)
+printf '%s\n' "${results[@]/#0000000000/}"
+unset results
 tickReset
 ;;
 
