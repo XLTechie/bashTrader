@@ -161,6 +161,17 @@ catchJSONMessage || tickVars -nli
 tickReset
 ;;
 
+D)	# Delete all orders
+read -rN 1 -p "Are you sure you want to cancel all orders? "
+echo
+if [[ "$REPLY" == [yY] ]]; then
+echo "Cancelling..."
+r_delete 2/orders
+catchJSONMessage || tickVars -nli
+tickReset
+fi
+;;
+
 q|'')	# Get a basic quote
 [[ -z "$symbol" ]] && symbol=`getSymbol`
 getQuote -c

@@ -176,7 +176,6 @@ printf '{
 "order_class": "%s"%b%b%b
 }' $symbol $qty $side $type ${timeInForce:-day} ${extendedHours:-false} ${class:-simple} \
 ${price:+",\n\"limit_price\": \"$price\""} ${stop:+",\n\"stop_price\": \"$stop\""} ${myOrderID:+",\n\"client_order_id\": \"$myOrderID\""} 
-#perl -pe 's|\n|\r\n|' > /tmp/order
 
 # order_class: simple, bracket, oco or oto
 #take_profit { limit_price, stop_loss { stop_price, limit_price } }
