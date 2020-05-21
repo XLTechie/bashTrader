@@ -142,14 +142,12 @@ priceRequired=yes
 ;;
 t|T|b|B|s|S)
 echo 1>&2 'Not implemented!'
-unset type
 ;;
 c|C)
 unset type
 return	# Do not create an order
 ;;
 *)
-unset type
 echo 1>&2 "m: market, l: limit, s: stop, t: stop-limit, b: braket, or c: cancel."
 ;;
 esac #}
@@ -160,9 +158,11 @@ if [[ -n "$priceRequired" ]]; then	#{
 # Check the price for pricyness, and if it doesn't look right, ask for it
 while [[ ! "$price" =~ ^[0-9]+(\.[0-9]{1,4})?$ ]]; do	#{
 echo 1>&2 "$symbol: `getQuote -c`"
-read -rp "Limit price: " price _
+read -rp "Limit price (0 to cancel): " price _
 done	#}
 fi	#}
+
+[[ "$price" == 0 ]] && return
 
 # We now have enough information to construct the order
 # At the moment, we do that by printing it to the caller
