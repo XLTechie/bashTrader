@@ -104,6 +104,7 @@ fi	#}
 # If quantity wasn't set, get it
 while [[ ! $qty =~ ^[1-9][0-9]*$ ]]; do	#{
 read -rp "Quantity: " qty _
+[[ "$qty" = 0 ]] && return
 done	#}
 
 # If side wasn't set by options, configure the side
